@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Home</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Home Page</title>
+  <link rel="stylesheet" href="home.css" />
 </head>
 <body>
-      <h1>Welcome to the Home Page</h1>
-      <h2><%- 1+1 %></h2>
-      <p><%- name %></p>
-      <p><%- address %></p>
+  <%- include("./components/navbar.ejs") %>
+
+  <main class="main-content">
+    <h1>Welcome to Our Home Page</h1>
+    <p>This is a simple home page with a dynamic navbar and a sticky footer.</p>
+  </main>
+
+  <%- include("./components/footer.ejs") %>
 
 </body>
 </html>

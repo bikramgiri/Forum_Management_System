@@ -5,19 +5,23 @@ app.set('view engine', 'ejs')
 
 
 app.get('/', (req, res) => {
-    const name = 'John Doe'
-    const address = 'Itahari'
-    res.render('home', { name: name, address: address })
+    res.render('home')
 })
 
-app.get('/about', (req, res) => {
-    res.render('about.ejs')
+app.get("/register", (req, res) => {
+    res.render('auth/register')
+})
+
+app.get("/login", (req, res) => {
+    res.render('auth/login')
 })
 
 
+app.use(express.static('public/css'))
 
 
-app.listen(3000, () => {
-    console.log('Project is running on port 3000')
+const PORT = 3000
+app.listen(PORT, () => {
+    console.log('Project is running at port ' + PORT)
 })
 

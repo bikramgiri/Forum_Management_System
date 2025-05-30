@@ -11,7 +11,7 @@ body {
   min-height: 100vh;
 }
 
-header {
+/* header {
   background-color: #007bff;
 }
 
@@ -45,7 +45,7 @@ header {
 .nav-link:hover,
 .nav-link.active {
   background-color: rgba(255, 255, 255, 0.2);
-}
+} */
 
 .main-content {
   flex: 1;
@@ -54,9 +54,10 @@ header {
   background-color: #f9f9f9;
 }
 
-footer {
+
+/* footer {
   background-color: #007bff;
   color: white;
   text-align: center;
   padding: 15px 0;
-}
+} */

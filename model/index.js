@@ -28,7 +28,9 @@ sequelize.authenticate() // Authenticate the connection to the database
     db.sequelize = sequelize // Add sequelize  to the db object
      
     // importing model files
-    db.users = require('./userModel')(sequelize, DataTypes) // Import the user model and pass the sequelize instance and DataTypes
+    db.users = require('./userModel')(sequelize, DataTypes) 
+    db.blogs = require('./blogModel')(sequelize, DataTypes)
+    
 
     db.sequelize.sync({force: false }).then(() => { // Sync the database with the models
         console.log('Synced done!!') // Log a message indicating that the database has been synced

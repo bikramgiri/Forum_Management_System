@@ -1,8 +1,12 @@
 require('dotenv').config() // Load environment variables from a .env file into process.env
 const express = require('express')
+const { users } = require('./model/index')
 const app = express()
 
 app.set('view engine', 'ejs')
+app.use(express.urlencoded({ extended: true })) // server side form data ko lagi
+app.use(express.json()) // client side form data ko lagi
+
 require('./model/index') // Import the database connection and models
 
 
@@ -16,6 +20,24 @@ app.get("/register", (req, res) => {
 
 app.get("/login", (req, res) => {
     res.render('auth/login')
+})
+
+app.post("/register", async (req, res) => {
+    // **Perfrom Destructuring
+    // const username = req.body.username
+    // const email = req.body.email
+    // const password = req.body.password
+    // **OR
+    const { username, email, password } = req.body
+
+    await users.create({
+        username: username,
+        email: email,
+        password: password
+    })
+    .then(() => {
+        res.redirect('/login') 
+    })
 })
 
 

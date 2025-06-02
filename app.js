@@ -2,6 +2,7 @@ require('dotenv').config() // Load environment variables from a .env file into p
 const express = require('express')
 const { users } = require('./model/index')
 const app = express()
+const bcrypt = require('bcrypt')
 
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({ extended: true })) // server side form data ko lagi
@@ -33,7 +34,7 @@ app.post("/register", async (req, res) => {
     await users.create({
         username: username,
         email: email,
-        password: password
+        password: bcrypt.hashSync(password, 10) // Hashing the password
     })
     .then(() => {
         res.redirect('/login') 

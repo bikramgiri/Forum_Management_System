@@ -3,6 +3,8 @@ const express = require('express')
 const { users } = require('./model/index')
 const app = express()
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+const e = require('express')
 
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({ extended: true })) // server side form data ko lagi
@@ -72,19 +74,34 @@ app.post("/login", async (req, res) => {
     //     return res.status(400).send('Invalid email')
     // }
     // **OR
+    
+    // **Check if the user exists
     const data = await users.findAll({
         where: {
             email: email
         }
     })
-    if (data.length === 0) {
+    if (data.length === 0) { // If no user found with the given email
         return res.status(400).send('Invalid email')
-    }else{ 
-    // **Check if the password is valid
-    const isPasswordValid = bcrypt.compareSync(password, data.password)
-    if (!isPasswordValid) {
-        return res.status(400).send('Invalid password')
-    }}
+    }else {
+        // **Check if the password is valid
+        const isPasswordValid = bcrypt.compareSync(password, data[0].password) // data[0] because findAll returns an array
+        if (!isPasswordValid) {
+            return res.status(400).send('Invalid password')
+        }else {
+            // **Generate JWT token
+            const token = jwt.sign({ id: data[0].id, email: data[0].email }, process.env.JWT_SECRETKEY, { expiresIn: '1d' }) // Sign the token with a secret key and set expiration time
+            // console.log(token)
+            // **Set the token in the response header
+            res.cookie('token', token, { 
+                httpOnly: true,  // Prevent client-side JavaScript from accessing the cookie
+                // secure: true, // Use secure flag to ensure the cookie is sent over HTTPS only
+                // sameSite: 'none', // Prevent CSRF attacks by restricting how cookies are sent with cross-site requests
+                maxAge: 1000 * 60 * 60 * 48 // 2 days
+            }) // Set cookie with httpOnly flag
+            res.redirect('/')
+        }
+    } 
 
     
     // **Second Method
@@ -108,7 +125,7 @@ app.post("/login", async (req, res) => {
     //     return res.status(400).send('Invalid password')
     // }
 
-    res.redirect('/')
+    // res.redirect('/')
 })
 
 

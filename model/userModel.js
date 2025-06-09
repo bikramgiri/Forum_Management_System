@@ -1,4 +1,4 @@
-const makeUserTable = (sequelize,DataTypes)=>{
+module.exports = (sequelize,DataTypes)=>{
       const User = sequelize.define('user',{
             username : {
                   type : DataTypes.STRING,
@@ -24,4 +24,3 @@ const makeUserTable = (sequelize,DataTypes)=>{
       return User // Return the Blog model
 }
 
-module.exports = makeUserTable // Export the makeBlogTable function so that it can be used in other files

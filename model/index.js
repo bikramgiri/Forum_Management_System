@@ -29,8 +29,20 @@ sequelize.authenticate() // Authenticate the connection to the database
      
     // importing model files
     db.users = require('./userModel')(sequelize, DataTypes) 
-    db.blogs = require('./blogModel')(sequelize, DataTypes)
+    db.questions = require('./questionModel')(sequelize, DataTypes)
+    db.answers = require('./answerModel')(sequelize,DataTypes)
     
+    // Define associations between models
+    db.users.hasMany(db.questions)
+    db.questions.belongsTo(db.users)
+    
+    // Define associations between users and answers
+    db.questions.hasMany(db.answers)
+    db.answers.belongsTo(db.questions)
+
+    db.users.hasMany(db.answers)
+    db.answers.belongsTo(db.users)
+
 
     db.sequelize.sync({force: false }).then(() => { // Sync the database with the models
         console.log('Synced done!!') // Log a message indicating that the database has been synced

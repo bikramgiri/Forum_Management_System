@@ -1,19 +1,17 @@
-const makeUserTable = (sequelize,DataTypes)=>{
-      const Blog = sequelize.define('blog',{
+module.exports = (sequelize,DataTypes)=>{
+      const Question = sequelize.define('question',{
             title : {
                   type : DataTypes.STRING,
                   allowNull : false                
             },
-            subtitle : {
+            image : {
                   type : DataTypes.STRING,
-                  allowNull : false                
             },
             description : {
                   type : DataTypes.TEXT,
                   allowNull : false                
             }            
       })
-      return Blog 
+      return Question 
 }
 
-module.exports = makeUserTable 

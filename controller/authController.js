@@ -88,9 +88,8 @@ exports.handleLogin =  async (req, res) => {
         }else {
             // **Generate JWT token
             const token = jwt.sign({ id: data[0].id, email: data[0].email }, process.env.JWT_SECRETKEY, { expiresIn: '1d' }) // Sign the token with a secret key and set expiration time
-            // console.log(token)
             // **Set the token in the response header
-            res.cookie('token', token, { 
+            res.cookie('jwtToken', token, { 
                 httpOnly: true,  // Prevent client-side JavaScript from accessing the cookie
                 // secure: true, // Use secure flag to ensure the cookie is sent over HTTPS only
                 // sameSite: 'none', // Prevent CSRF attacks by restricting how cookies are sent with cross-site requests

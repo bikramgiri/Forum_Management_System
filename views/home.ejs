@@ -2,18 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Questions</title>
   <link rel="stylesheet" href="home.css" />
 </head>
 <body>
   <%- include("./components/navbar.ejs") %>
 
-  <main class="main-content">
-    <h1>Welcome to Our Home Page</h1>
-    <p>This is a simple home page with a dynamic navbar and a sticky footer.</p>
-  </main>
+  <div class="container">
+    <h1>Questions Collection</h1>
+    <% data.forEach((item)=>{ %>
+      <div class="card">
+      <p class="question"><%- item.title %></p>
+      <p class="author">Asked by: <span><%- item.user.username %></span></p>
+      <p class="date">Date: <span><%= new Date(item.updatedAt).toDateString() %></span></p>
+    </div>
+    <% }) %>
 
+
+  </div>
   <%- include("./components/footer.ejs") %>
 
 </body>

@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { users } = require("../model")
+const { users, questions } = require("../model")
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
@@ -10,8 +10,17 @@ const jwt = require('jsonwebtoken')
 
 // module.exports = renderHomePage;
 // **OR
-exports.renderHomePage = (req, res) => {
-    res.render('home')
+exports.renderHomePage = async(req, res) => {
+    const data = await questions.findAll(
+        {
+            include: [{
+                model: users,
+                attributes: ['username', 'email'] // Include only specific fields from the users table
+            }],
+            order: [['createdAt', 'DESC']] // Order by createdAt in descending order
+        }
+    )
+    res.render('home', {data: data})
 }
 
 exports.renderRegisterPage = (req, res) => {

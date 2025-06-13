@@ -4,19 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>navbar</title>
-  <link rel="stylesheet" href="navbar.css">
+  <link rel="stylesheet" href="/navbar.css">
 </head>
 <body>
-    <header>
-    <nav class="navbar">
-      <div class="nav-brand">DisForum</div>
-      <ul class="nav-links">
-        <li><a href="/" class="nav-link active">Home</a></li>
-        <li><a href="askquestion" class="nav-link">Ask Question</a></li>
-        <li><a href="login" class="nav-link">Login</a></li>
-        <li><a href="register" class="nav-link">Register</a></li>
-      </ul>
-    </nav>
-  </header>
+<header>
+  <nav class="navbar">
+    <div class="nav-brand">DisForum</div>
+    <ul class="nav-links">
+      <li><a href="/" class="nav-link active">Home</a></li>
+      <% if(isAuthenticated){ %>
+        <li><a href="/askquestion" class="nav-link">Ask Question</a></li>
+        <li><a href="/logout" class="nav-link">Logout</a></li>
+      <% } else { %>
+        <li><a href="/login" class="nav-link">Login</a></li>
+        <li><a href="/register" class="nav-link">Register</a></li>
+      <% } %>
+    </ul>
+  </nav>
+</header>
 </body>
 </html>

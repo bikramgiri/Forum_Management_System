@@ -134,4 +134,8 @@ exports.handleLogin =  async (req, res) => {
 }
 
 
-
+exports.handleLogout = (req, res) => {
+    // **Clear the JWT token cookie
+    res.clearCookie('jwtToken')
+    res.redirect('/login') // Redirect to the login page after logout
+}

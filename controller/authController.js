@@ -2,6 +2,7 @@ require('dotenv').config()
 const { users, questions } = require("../model")
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const sendEmail = require('../utils/sendEmail')
 
 
 // const renderHomePage = (req, res) => {
@@ -48,6 +49,12 @@ exports.handleRegister =  async (req, res) => {
         return res.status(400).send('User already exists')
     }
 
+    await sendEmail({
+        email: email,
+        text: "Thank you for Regestering!",
+        subject: "Welcome To DisForum!"
+    })
+
     // **Create a new user
     await users.create({
         username: username,
@@ -87,6 +94,15 @@ exports.handleLogin =  async (req, res) => {
             email: email
         }
     })
+    
+    // send email to user login successfully
+    await sendEmail({
+        email: email,
+        text: "Thank you for Logging In!",
+        subject: "Welcome Back To DisForum!"
+    })
+
+
     if (data.length === 0) { // If no user found with the given email
         return res.status(400).send('Invalid email')
     }else {
@@ -138,4 +154,44 @@ exports.handleLogout = (req, res) => {
     // **Clear the JWT token cookie
     res.clearCookie('jwtToken')
     res.redirect('/login') // Redirect to the login page after logout
+}
+
+exports.renderForgotPasswordPage = (req, res) => {
+    res.render('./auth/forgotPassword')
+}
+
+exports.handleForgotPassword = async (req, res) => {
+    const {email} = req.body
+    const otp = Math.floor(100000 + Math.random() * 900000) // Generate a random 6-digit OTP
+    if (!email) {
+        return res.status(400).send('Please provide an email')
+    }
+    // **Check if the user exists
+    const data = await users.findAll({
+        where: {
+            email: email
+        }
+    })
+    if (data.length === 0) {
+        return res.status(400).send('User not found')
+    }
+    // **Send OTP to the above incoming email
+    sendEmail({
+        email : email,
+        subject : "Your OTP for reset password",
+        text : `Your OTP is ${otp}`
+    })
+    data[0].otp = otp
+    await data[0].save()
+
+    res.redirect("/verifyOtp")
+}
+
+exports.renderVerifyOtpPage = (req, res) => {
+    res.render("./auth/verifyOtp")
+}
+
+exports.handleVerifyOtp = async (req, res) => {
+    
+
 }

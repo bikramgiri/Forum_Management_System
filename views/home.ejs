@@ -14,7 +14,7 @@
     <% data.forEach((item)=>{ %>
     <div class="card" onclick="location.href='/question/<%- item.id %>'" style="cursor: pointer; justify-items: center;">
       <p class="question"><%- item.title %></p>
-      <img src="http://localhost:3000/<%- item.image %>" alt="Question Image" class="question-image" height="200px" width="300px" />
+      <img src="<%- item.image %>" alt="Question Image" class="question-image" height="200px" width="300px" />
       <p class="description">Description: <span><%- item.description %></span></p>
       <p class="author">Asked by: <span><%- item.user.username %></span></p>
       <p class="date">Date: <span><%= new Date(item.updatedAt).toDateString() %></span></p>

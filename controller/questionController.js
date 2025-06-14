@@ -1,3 +1,4 @@
+require('dotenv').config() // Load environment variables from a .env file into process.env
 const { questions, users, answers } = require("../model")
 
 exports.renderAskQuestionPage = (req, res) => {
@@ -14,15 +15,15 @@ exports.handleAskQuestion = async (req, res) => {
       await questions.create({
             title: title,
             description: description,
-            image: fileName,
-            userId : userId
+            image: `${process.env.PROJECT_URL}${fileName}`, // Assuming you have a file upload middleware that saves the file and provides the filename 
+            userId: userId
       })
       res.redirect('/')
 }
 
 exports.getAllQuestions = async (req, res) => {
       const data = await questions.findAll({
-            include : [{
+            include: [{
                   model: users
             }]
       })

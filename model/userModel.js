@@ -13,7 +13,7 @@ module.exports = (sequelize,DataTypes)=>{
                   allowNull : false                
             },
             otp : {
-                  type : DataTypes.STRING,
+                  type : DataTypes.INTEGER,
                   allowNull : true                
             },
             otpGeneratedTime : {
@@ -21,6 +21,6 @@ module.exports = (sequelize,DataTypes)=>{
                   allowNull : true                
             }            
       })
-      return User // Return the Blog model
+      return User 
 }
 

@@ -182,16 +182,102 @@ exports.handleForgotPassword = async (req, res) => {
         text : `Your OTP is ${otp}`
     })
     data[0].otp = otp
+    data[0].otpGeneratedTime = new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString() // Store the current date and time as a string, example: "10/10/2023 10:10:10 AM"
+    // **Save the OTP and OTP generated time to the user
     await data[0].save()
 
-    res.redirect("/verifyOtp")
+    res.redirect("/verifyOtp?email=" + email) // Redirect to the verify OTP page with the email as a query parameter
 }
 
 exports.renderVerifyOtpPage = (req, res) => {
-    res.render("./auth/verifyOtp")
+    const email = req.query.email
+    res.render("./auth/verifyOtp", { email: email })
 }
 
 exports.handleVerifyOtp = async (req, res) => {
-    
-
+    const {otp} = req.body
+    const email = req.params.id
+    // **Check if the user exists
+    const data = await users.findAll({
+        where: {
+            email: email,
+            otp: otp
+        }
+    })
+    if (data.length === 0) {
+        return res.status(400).send('Invalid OTP')
+    }
+    // **Check if the OTP is expired 
+    const otpGeneratedTime = new Date(data[0].otpGeneratedTime) // Convert the stored string to a Date object
+    const currentTime = new Date() // Get the current date and time
+    const timeDiff = currentTime - otpGeneratedTime
+    const otpExpiryTime = 2 * 60 * 1000 // 2 minutes in milliseconds
+    if (timeDiff > otpExpiryTime) {
+        return res.status(400).send('OTP has expired')
+    }
+    res.redirect(`/resetPassword?email=${email}&otp=${otp}`) // Redirect to the reset password page with the email and OTP as query parameters
 }
+
+exports.renderResetPasswordPage = (req, res) => {
+    const {email, otp} = req.query
+    if (!email || !otp) {
+        return res.status(400).send('Invalid request, email and OTP are required')
+    }
+    res.render("./auth/resetPassword", { email: email, otp: otp })
+}
+
+exports.handleResetPassword = async (req, res) => {
+    const {email, otp} = req.params
+    const {newPassword, confirmPassword} = req.body
+    if (!email || !otp || !newPassword || !confirmPassword) {
+        return res.status(400).send('Please provide email, otp, new password and confirm password')
+    }
+    if( newPassword !== confirmPassword) {
+        return res.status(400).send('New password and confirm password do not match')
+    }
+    // **Check if the user exists
+    const data = await users.findAll({
+        where: {
+            email: email,
+            otp: otp
+        }
+    })
+    if (data.length === 0) {
+        return res.status(400).send('Invalid email or OTP')
+    }
+    // **Check if the OTP is expired 
+    const otpGeneratedTime = new Date(data[0].otpGeneratedTime) // Convert the stored string to a Date object
+    const currentTime = new Date() // Get the current date and time
+    const timeDiff = currentTime - otpGeneratedTime
+    const otpExpiryTime = 2 * 60 * 1000 // 2 minutes in milliseconds
+    if (timeDiff > otpExpiryTime) {
+        return res.status(400).send('OTP has expired')
+    }
+    // **Reset the password
+    await users.update({ 
+        password: bcrypt.hashSync(newPassword, 10) // Hash the new password
+    }, { where: { 
+        email: email 
+      } 
+    }
+    )
+    // .then(() => {
+    //     // **Clear the OTP and OTP generated time
+    //     data[0].otp = null
+    //     data[0].otpGeneratedTime = null
+    //     data[0].save() // Save the changes to the user
+    // })
+    .catch(err => {
+        console.error('Error resetting password:', err)
+        return res.status(500).send('Internal server error')
+    })
+    // **Send email to the user that the password has been reset successfully
+    await sendEmail({
+        email: email,
+        text: "Your password has been reset successfully!",
+        subject: "Password Reset Confirmation"
+    })
+    // **Redirect to the login page after resetting the password
+    res.redirect("/login") 
+}
+

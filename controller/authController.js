@@ -12,6 +12,7 @@ const sendEmail = require('../utils/sendEmail')
 // module.exports = renderHomePage;
 // **OR
 exports.renderHomePage = async(req, res) => {
+    const [success] = req.flash('success') // Get success message from flash
     const data = await questions.findAll(
         {
             include: [{
@@ -21,15 +22,16 @@ exports.renderHomePage = async(req, res) => {
             order: [['createdAt', 'DESC']] // Order by createdAt in descending order
         }
     )
-    res.render('home', {data: data})
+    res.render('home', {data: data, success: success}) // Pass the data to the home page
 }
 
 exports.renderRegisterPage = (req, res) => {
-    res.render('auth/register')
+    const [error] = req.flash('error') // Get error message from flash
+    res.render('auth/register', { error: error })
 }
 
 exports.handleRegister =  async (req, res) => {
-    const { username, email, password } = req.body
+        const { username, email, password } = req.body
     if (!username || !email || !password) {
         return res.status(400).send('Please provide username, email, and password')
     }
@@ -46,7 +48,9 @@ exports.handleRegister =  async (req, res) => {
         }
     })
     if (data.length > 0) {
-        return res.status(400).send('User already exists')
+        // return res.status(400).send('User already exists')
+        req.flash('error', 'User already exists') // Use flash message to show error
+        return res.redirect('/register') // Redirect to register page if user already exists
     }
 
     await sendEmail({
@@ -61,17 +65,13 @@ exports.handleRegister =  async (req, res) => {
         email: email,
         password: bcrypt.hashSync(password, 10) // Hashing the password
     })
-    .then(() => {
-        res.redirect('/login')
-    })
-    .catch(err => {
-        console.error('Error creating user:', err)
-        res.status(500).send('Internal server error')
-    })
+    res.redirect('/login')
 }
 
 exports.renderLoginPage = (req, res) => {
-    res.render('auth/login')
+    const [error] = req.flash('error')
+    const [success] = req.flash('success') // Get success message from flash
+    res.render('auth/login', { error: error, success: success }) // Pass the error and success messages to the login page
 }
 
 exports.handleLogin =  async (req, res) => {
@@ -104,12 +104,16 @@ exports.handleLogin =  async (req, res) => {
 
 
     if (data.length === 0) { // If no user found with the given email
-        return res.status(400).send('Invalid email')
+        // return res.status(400).send('Invalid email')
+        req.flash('error', 'No user found with this email') // Use flash message to show error
+        res.redirect('/login') // Redirect to login page if email is invalid
     }else {
         // **Check if the password is valid
         const isPasswordValid = bcrypt.compareSync(password, data[0].password) // data[0] because findAll returns an array
         if (!isPasswordValid) {
-            return res.status(400).send('Invalid password')
+            // return res.status(400).send('Invalid password')
+            req.flash('error', 'Invalid password') // Use flash message to show error
+            res.redirect('/login') // Redirect to login page if password is invalid
         }else {
             // **Generate JWT token
             const token = jwt.sign({ id: data[0].id, email: data[0].email }, process.env.JWT_SECRETKEY, { expiresIn: '1d' }) // Sign the token with a secret key and set expiration time
@@ -120,6 +124,7 @@ exports.handleLogin =  async (req, res) => {
                 // sameSite: 'none', // Prevent CSRF attacks by restricting how cookies are sent with cross-site requests
                 maxAge: 1000 * 60 * 60 * 48 // 2 days
             }) // Set cookie with httpOnly flag
+            req.flash('success', 'Login successful') // Use flash message to show success
             res.redirect('/')
         }
     } 
@@ -153,6 +158,7 @@ exports.handleLogin =  async (req, res) => {
 exports.handleLogout = (req, res) => {
     // **Clear the JWT token cookie
     res.clearCookie('jwtToken')
+    req.flash('success', 'Logout successful') // Use flash message to show success
     res.redirect('/login') // Redirect to the login page after logout
 }
 

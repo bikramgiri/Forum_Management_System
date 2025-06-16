@@ -12,6 +12,7 @@
   <main class="main-content">
     <div class="register-container">
       <h2>Create Account</h2>
+      <p style="color: red;"><%- error %></p>
       <form action="/register" method="POST">
         <input type="text" name="username" placeholder="Enter username" required />
         <input type="email" name="email" placeholder="Enter email" required />

@@ -10,6 +10,7 @@
   <%- include("./components/navbar.ejs") %>
 
   <div class="container">
+    <p style="color:green; justify-items: center;"><%- success %></p>
     <h1>Questions Collection</h1>
     <% data.forEach((item)=>{ %>
     <div class="card" onclick="location.href='/question/<%- item.id %>'" style="cursor: pointer; justify-items: center;">

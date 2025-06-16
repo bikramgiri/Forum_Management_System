@@ -1,16 +1,17 @@
 const { handleRegister, renderRegisterPage, handleLogin, renderLoginPage, renderHomePage, handleLogout, renderForgotPasswordPage, handleForgotPassword, renderVerifyOtpPage, handleVerifyOtp, renderResetPasswordPage, handleResetPassword } = require("../controller/authController")
+const catchError = require("../utils/catchError")
 
 const router = require("express").Router()
 
-router.route("/").get(renderHomePage)
-router.route("/register").post(handleRegister).get(renderRegisterPage)
-router.route("/login").post(handleLogin).get(renderLoginPage)
-router.route("/logout").get(handleLogout)
-router.route("/forgotPassword").get(renderForgotPasswordPage).post(handleForgotPassword)
-router.route("/verifyOtp").get(renderVerifyOtpPage)
-router.route("/verifyOtp/:id").post(handleVerifyOtp)
-router.route("/resetPassword").get(renderResetPasswordPage)
-router.route("/resetPassword/:email/:otp").post(handleResetPassword)
+router.route("/").get(catchError(renderHomePage))
+router.route("/register").post(catchError(handleRegister)).get(catchError(renderRegisterPage))
+router.route("/login").post(catchError(handleLogin)).get(catchError(renderLoginPage))
+router.route("/logout").get(catchError(handleLogout))
+router.route("/forgotPassword").get(catchError(renderForgotPasswordPage)).post(catchError(handleForgotPassword))
+router.route("/verifyOtp").get(catchError(renderVerifyOtpPage))
+router.route("/verifyOtp/:id").post(catchError(handleVerifyOtp))
+router.route("/resetPassword").get(catchError(renderResetPasswordPage))
+router.route("/resetPassword/:email/:otp").post(catchError(handleResetPassword))
 // **OR
 // router.route("/resetPassword/:id1/:id2").post(handleResetPassword)
 

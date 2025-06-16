@@ -9,10 +9,12 @@
 <body>
   
   <%- include("../components/navbar.ejs") %>
-
+  
   <main class="main-content">
     <div class="login-container">
+      <p style="color: green;"><%- success %></p>
       <h2>Login to Your Account</h2>
+      <p style="color: red;"><%- error %></p>
       <form action="/login" method="POST">
         <input type="email" name="email" placeholder="Enter email" required />
         <input type="password" name="password" placeholder="Enter password" required />

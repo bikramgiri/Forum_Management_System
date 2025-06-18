@@ -14,6 +14,8 @@ const jwt = require("jsonwebtoken")
 const {promisify} = require("util")
 const session = require('express-session')
 const flash = require('connect-flash')
+const socketio = require('socket.io')
+const { answers } = require('./model/index')
 
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({ extended: true })) // server side form data ko lagi
@@ -55,7 +57,36 @@ app.use(express.static('./storage/'))
 app.use(express.static('public/css'))
 
 const PORT = 3000
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log('Project is running at port ' + PORT)
 })
 
+const io = socketio(server, {
+    cors: {
+        // origin: "http://localhost:3000", // Allow requests from this origin
+        origin : "*", // Allow requests from all origins (for development purposes)
+        // origin: "https://your-production-domain.com", // For production, replace with your actual domain
+        // methods: ["GET", "POST"], // Allowed HTTP methods
+        // credentials: true // Allow cookies to be sent with requests
+    }
+})
+
+io.on("connection", (socket) => {
+    socket.on("like", async (data) => {
+        const { answerId } = data; // Extract answerId from the object
+        try {
+            const answer = await answers.findByPk(answerId);
+            if (answer) {
+                answer.likes += 1; // Increment the likes count
+                await answer.save(); // Save the updated answer
+                // Emit the updated likes count and answer ID to the client
+                socket.emit("likeUpdate", { answerId, likes: answer.likes }); // Emit the updated likes count to the client
+                // socket.broadcast.emit("likeUpdate", { answerId, likes: answer.likes }); // Broadcast the updated likes count to all other clients
+            } else {
+                console.error(`Answer with ID ${answerId} not found`);
+            }
+        } catch (error) {
+            console.error("Error updating likes:", error);
+        }
+    });
+});

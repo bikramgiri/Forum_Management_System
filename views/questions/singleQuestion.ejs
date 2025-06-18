@@ -28,6 +28,9 @@
           <p class="answer">Answer: <span><%- answer.answerText %></span></p>
           <p class="date">Date: <span><%= new Date(answer.updatedAt).toDateString() %></span></p>
           <p class="author">Answered by: <span><%- answer.user.username %></span></p>
+          <button onclick="likePost(<%= answer.id %>)">Like</button>
+          <span id="likes-<%= answer.id %>"><%= answer.likes || 0 %></span>
+
         </div>
       <% }) %>
     </div>
@@ -41,7 +44,23 @@
     </div>
   </div>
   
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    function likePost(answerId) {
+      // console.log("Like button clicked for answer ID:", answerId);
+      socket.emit("like", { answerId: answerId });
+    }
+    socket.on("likeUpdate", ({ answerId, likes }) => {
+      const likesElement = document.getElementById(`likes-${answerId}`);
+      if (likesElement) {
+        likesElement.textContent = likes;
+      }
+    });
+  </script>
+
   <%- include("../components/footer.ejs") %>
   
 </body>
 </html>
+,

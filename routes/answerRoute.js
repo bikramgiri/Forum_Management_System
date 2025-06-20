@@ -1,10 +1,10 @@
-const { handleAnser } = require('../controller/answerController');
+const { handleAnswer } = require('../controller/answerController');
 const { isAuthenticated } = require('../Middleware/isAuthenticated');
 const catchError = require('../utils/catchError');
 
 const router = require('express').Router();
 
-router.route("/:id").post(isAuthenticated, catchError(handleAnser))
+router.route("/:id").post(isAuthenticated, catchError(handleAnswer))
 
 module.exports = router;
 

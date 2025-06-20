@@ -119,9 +119,9 @@ exports.handleLogin =  async (req, res) => {
             const token = jwt.sign({ id: data[0].id, email: data[0].email }, process.env.JWT_SECRETKEY, { expiresIn: '1d' }) // Sign the token with a secret key and set expiration time
             // **Set the token in the response header
             res.cookie('jwtToken', token, { 
-                httpOnly: true,  // Prevent client-side JavaScript from accessing the cookie
+                httpOnly: false,  // Prevent client-side JavaScript from accessing the cookie
                 // secure: true, // Use secure flag to ensure the cookie is sent over HTTPS only
-                // sameSite: 'none', // Prevent CSRF attacks by restricting how cookies are sent with cross-site requests
+                sameSite: 'Strict', // Prevent the browser from sending this cookie along with cross-site requests
                 maxAge: 1000 * 60 * 60 * 48 // 2 days
             }) // Set cookie with httpOnly flag
             req.flash('success', 'Login successful') // Use flash message to show success

@@ -15,7 +15,8 @@ const {promisify} = require("util")
 const session = require('express-session')
 const flash = require('connect-flash')
 const socketio = require('socket.io')
-const { answers } = require('./model/index')
+const { answers, sequelize } = require('./model/index')
+const { QueryTypes } = require('sequelize')
 
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({ extended: true })) // server side form data ko lagi
@@ -66,27 +67,36 @@ const io = socketio(server, {
         // origin: "http://localhost:3000", // Allow requests from this origin
         origin : "*", // Allow requests from all origins (for development purposes)
         // origin: "https://your-production-domain.com", // For production, replace with your actual domain
-        // methods: ["GET", "POST"], // Allowed HTTP methods
-        // credentials: true // Allow cookies to be sent with requests
+        methods: ["GET", "POST"], // Allowed HTTP methods
+        credentials: true // Allow cookies to be sent with requests
     }
 })
 
 io.on("connection", (socket) => {
-    socket.on("like", async (data) => {
-        const { answerId } = data; // Extract answerId from the object
-        try {
-            const answer = await answers.findByPk(answerId);
-            if (answer) {
-                answer.likes += 1; // Increment the likes count
-                await answer.save(); // Save the updated answer
-                // Emit the updated likes count and answer ID to the client
-                socket.emit("likeUpdate", { answerId, likes: answer.likes }); // Emit the updated likes count to the client
-                // socket.broadcast.emit("likeUpdate", { answerId, likes: answer.likes }); // Broadcast the updated likes count to all other clients
-            } else {
-                console.error(`Answer with ID ${answerId} not found`);
-            }
-        } catch (error) {
-            console.error("Error updating likes:", error);
+  socket.on("like", async ({ answerId, token }) => {
+  // console.log("Like event received:", { answerId, token });
+      // Check if answer exists
+      const answer = await answers.findByPk(answerId);
+      if (answer && token) {
+      // Verify JWT token
+      const decrytedResult = await promisify(jwt.verify)(token, process.env.JWT_SECRETKEY);
+      if(decrytedResult){
+       const user = await sequelize.query(`SELECT * FROM  likes_${answerId} WHERE userId=${decrytedResult.id}`, {
+          type: QueryTypes.SELECT
+        });
+        if(user.length == 0){
+        await sequelize.query(`INSERT INTO likes_${answerId} (userId) VALUES(${decrytedResult.id})`, {
+          type: QueryTypes.INSERT
+        });
         }
+      }
+
+    const likes = await sequelize.query(`SELECT * FROM likes_${answerId}`, {
+      type: QueryTypes.SELECT
     });
+
+    const likesCount = likes.length
+    socket.emit("likeUpdate", {likesCount, answerId});
+    }
+  });
 });

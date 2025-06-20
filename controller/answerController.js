@@ -1,14 +1,23 @@
-const { answers } = require("../model")
+const { QueryTypes } = require("sequelize")
+const { answers, sequelize } = require("../model")
 
-exports.handleAnser = async (req, res) => {
+exports.handleAnswer = async (req, res) => {
       const userId = req.userId
       const{answer } = req.body
       const{id: questionId} = req.params
-      await answers.create({
+      const data = await answers.create({
             answerText: answer,
             userId: userId,
             questionId: questionId
       })
+
+      await sequelize.query(`CREATE TABLE likes_${data.id} (
+            id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            userId INT NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+      )`, { 
+            type: QueryTypes.CREATE
+       })
+
       res.redirect(`/question/${questionId}`)
 }
 

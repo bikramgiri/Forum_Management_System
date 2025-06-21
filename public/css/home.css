@@ -1,52 +1,97 @@
-/* Make sure the page fills the height */
+/* Global Styles */
 body {
-  height: 100%;
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f2f2f2;
-
-}
-
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding-top: 80px; 
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 30px;
+  background-color: #f7f9fc;
   color: #333;
+  line-height: 1.6;
 }
 
+/* Container */
+.container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 80px 20px 40px;
+}
+
+/* Page Title */
+.page-title {
+  text-align: center;
+  font-size: 32px;
+  color: #2c3e50;
+  margin-bottom: 40px;
+}
+
+/* Success Alert */
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Card Design */
 .card {
-  background-color: #ffffff;
+  background: #fff;
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-  transition: transform 0.2s;
+  margin-bottom: 30px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
 .card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-6px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
 }
 
+/* Question Title */
 .question {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
   margin-bottom: 10px;
-  color: #333;
+  color: #007bff;
 }
 
+/* Question Image */
+.question-image {
+  width: 100%;
+  height: auto;
+  max-height: 250px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin: 15px 0;
+}
+
+/* Description, Author, Date */
+.description,
 .author,
 .date {
-  font-size: 14px;
-  color: #666;
+  font-size: 15px;
+  margin-bottom: 6px;
 }
 
 span {
   font-weight: 500;
-  color: #222;
+  color: #2f2f2f;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
+  .container {
+    padding: 60px 15px 30px;
+  }
+
+  .page-title {
+    font-size: 26px;
+  }
+
+  .question {
+    font-size: 18px;
+  }
 }

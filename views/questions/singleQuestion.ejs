@@ -9,84 +9,69 @@
 <body>
   <%- include("../components/navbar.ejs") %>
 
-  <div class="content-wrapper">
-    <div class="container">
-      <h2>Question</h2>
-      <div class="card" style="cursor: pointer; justify-items: center;">
-        <p class="question"><%- data[0].title %></p>
-        <img src="<%- data[0].image %>" alt="Question Image" class="question-image" height="200px" width="300px" />
-        <p class="description">Description: <span><%- data[0].description %></span></p>
-        <p class="date">Date: <span><%= new Date(data[0].updatedAt).toDateString() %></span></p>
-        <p class="author">Asked by: <span><%- data[0].user.username %></span></p>
+  <main class="content-wrapper">
+    <section class="container question-section">
+      <h2 class="section-title">Question</h2>
+      <div class="card question-card">
+        <h3 class="question"><%- data[0].title %></h3>
+        <img src="<%- data[0].image %>" alt="Question Image" class="question-image" />
+        <p class="description"><strong>Description:</strong> <span><%- data[0].description %></span></p>
+        <p class="date"><strong>Date:</strong> <span><%= new Date(data[0].updatedAt).toDateString() %></span></p>
+        <p class="author"><strong>Asked by:</strong> <span><%- data[0].user.username %></span></p>
       </div>
-    </div>
+    </section>
 
-    <div class="container answer">
-      <h2>Answer</h2>
+    <section class="container answer-section">
+      <h2 class="section-title">Answers</h2>
       <% answers.forEach((answer) => { %>
-        <div class="card">
-          <p class="answer">Answer: <span><%- answer.answerText %></span></p>
-          <p class="date">Date: <span><%= new Date(answer.updatedAt).toDateString() %></span></p>
-          <p class="author">Answered by: <span><%- answer.user.username %></span></p>
-          <button onclick="likePost(<%= answer.id %>)">Like</button>
+        <div class="card answer-card">
+          <p class="answer-text"><%- answer.answerText %></p>
+          <p class="date"><strong>Date:</strong> <%= new Date(answer.updatedAt).toDateString() %></p>
+          <p class="author"><strong>Answered by:</strong> <%- answer.user.username %></p>
+          <button class="like-btn" onclick="likePost(<%= answer.id %>)">Like</button>
           <span id="likes-<%= answer.id %>"><%= answer.likes || 0 %></span>
-
         </div>
       <% }) %>
-    </div>
+    </section>
 
-    <div class="container answerSection" >
-      <h2>Submit Your Answer</h2>
+    <section class="container form-section">
+      <h2 class="section-title">Submit Your Answer</h2>
       <form action="/answer/<%- data[0].id %>" method="POST">
-        <textarea name="answer" placeholder="Write your answer here..." id="answer" cols="10" rows="10" required></textarea><br>
+        <textarea name="answer" placeholder="Write your answer here..." required></textarea>
         <button type="submit" class="submit-btn">Submit Answer</button>
       </form>
-    </div>
-  </div>
-  
+    </section>
+  </main>
+
   <script src="/socket.io/socket.io.js"></script>
   <script>
-  // Function to get a specific cookie by name
-  function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-    return null;
-  }
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    }
 
-  const socket = io();
-  const jwtToken = getCookie('jwtToken');
-  // console.log("JWT Token:", jwtToken)
+    const socket = io();
+    const jwtToken = getCookie('jwtToken');
 
     function likePost(answerId) {
       if (!jwtToken) {
-        console.log("No JWT token found. Please log in.");
         alert("You must be logged in to like an answer.");
         return;
       }
-      socket.emit("like", { 
-        answerId: answerId,
-        token: jwtToken
-      });
+      socket.emit("like", { answerId, token: jwtToken });
     }
-    socket.on("likeUpdate", ({likesCount, answerId}) => {
-      console.log("Likes count updated:", likesCount);
-      const likes = document.getElementById(`likes-${answerId}`);
-      if (likes) {
-     likes.textContent = likesCount;
-  } else {
-    console.error(`Element with ID likes-${answerId} not found`);
-  }
+
+    socket.on("likeUpdate", ({ likesCount, answerId }) => {
+      const likesEl = document.getElementById(`likes-${answerId}`);
+      if (likesEl) likesEl.textContent = likesCount;
     });
 
     socket.on("error", ({ message }) => {
-    console.error("Server error:", message);
-    alert(message);
-  });
+      alert(message);
+    });
   </script>
 
   <%- include("../components/footer.ejs") %>
-  
 </body>
 </html>
-,

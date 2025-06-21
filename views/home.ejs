@@ -3,25 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Home</title>
+  <title>Home | Question Collection</title>
   <link rel="stylesheet" href="home.css" />
 </head>
 <body>
   <%- include("./components/navbar.ejs") %>
 
-  <div class="container">
-    <p style="color:green; justify-items: center;"><%- success %></p>
-    <h1>Questions Collection</h1>
-    <% data.forEach((item)=>{ %>
-    <div class="card" onclick="location.href='/question/<%- item.id %>'" style="cursor: pointer; justify-items: center;">
-      <p class="question"><%- item.title %></p>
-      <img src="<%- item.image %>" alt="Question Image" class="question-image" height="200px" width="300px" />
-      <p class="description">Description: <span><%- item.description %></span></p>
-      <p class="author">Asked by: <span><%- item.user.username %></span></p>
-      <p class="date">Date: <span><%= new Date(item.updatedAt).toDateString() %></span></p>
-    </div>
+  <main class="container">
+    <% if (success) { %>
+      <div class="alert-success"><%- success %></div>
+    <% } %>
+
+    <h1 class="page-title">📚 Questions Collection</h1>
+
+    <% data.forEach((item) => { %>
+      <div class="card" onclick="location.href='/question/<%- item.id %>'">
+        <h2 class="question"><%- item.title %></h2>
+        <img src="<%- item.image %>" alt="Question Image" class="question-image" />
+        <p class="description"><strong>Description:</strong> <span><%- item.description %></span></p>
+        <p class="author"><strong>Asked by:</strong> <span><%- item.user.username %></span></p>
+        <p class="date"><strong>Date:</strong> <span><%= new Date(item.updatedAt).toDateString() %></span></p>
+      </div>
     <% }) %>
-  </div>
+  </main>
 
   <%- include("./components/footer.ejs") %>
 </body>

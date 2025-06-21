@@ -1,5 +1,6 @@
 require('dotenv').config() // Load environment variables from a .env file into process.env
-const { questions, users, answers } = require("../model")
+const { QueryTypes } = require('sequelize')
+const { questions, users, answers, sequelize } = require("../model")
 
 exports.renderAskQuestionPage = (req, res) => {
       res.render('questions/askQuestion')
@@ -42,6 +43,19 @@ exports.renderSingleQuestionPage = async (req, res) => {
             }],
         }
     )
+
+    let likes, count = 0
+    try {
+      likes = await sequelize.query(`SELECT * FROM likes_${id}`, {
+        type: QueryTypes.SELECT
+    })
+    if(likes.length){
+      count = likes.length
+    }
+    } catch (error) {
+      console.error("Error fetching likes:", error)
+    }
+
     const answersData = await answers.findAll({
         where: {
             questionId: id
@@ -51,7 +65,7 @@ exports.renderSingleQuestionPage = async (req, res) => {
             attributes: ['username']
         }]
     })
-    res.render('./questions/singleQuestion', {data: data, answers: answersData}) // Render the single question page with the question data;
+    res.render('./questions/singleQuestion', {data: data, answers: answersData, likes: count}) // Render the single question page with the question data;
 }
 
 

@@ -84,7 +84,7 @@ io.on("connection", (socket) => {
        const user = await sequelize.query(`SELECT * FROM  likes_${answerId} WHERE userId=${decrytedResult.id}`, {
           type: QueryTypes.SELECT
         });
-        if(user.length == 0){
+        if(user.length === 0){
         await sequelize.query(`INSERT INTO likes_${answerId} (userId) VALUES(${decrytedResult.id})`, {
           type: QueryTypes.INSERT
         });
@@ -94,8 +94,12 @@ io.on("connection", (socket) => {
     const likes = await sequelize.query(`SELECT * FROM likes_${answerId}`, {
       type: QueryTypes.SELECT
     });
-
     const likesCount = likes.length
+    await answers.update(
+      { likes: likesCount },
+      { where: { id: answerId } }
+    );
+
     socket.emit("likeUpdate", {likesCount, answerId});
     }
   });

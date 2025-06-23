@@ -13,6 +13,7 @@ const answerRoute = require('./routes/answerRoute')
 const jwt = require("jsonwebtoken")
 const {promisify} = require("util")
 const session = require('express-session')
+const SequelizeStore = require('connect-session-sequelize')(session.Store); // Sequelize session store
 const flash = require('connect-flash')
 const socketio = require('socket.io')
 const { answers, sequelize } = require('./model/index')
@@ -22,8 +23,18 @@ app.set('view engine', 'ejs')
 app.use(express.urlencoded({ extended: true })) // server side form data ko lagi
 app.use(express.json()) // client side form data ko lagi
 app.use(cookieParser()) // Middleware to parse cookies
+
+// Configure session with Sequelize store
+const sessionStore = new SequelizeStore({
+  db: sequelize,
+  tableName: 'Sessions', // Optional: custom table name
+  checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
+  expiration: 2 * 24 * 60 * 60 * 1000, // Session expires after 2 days
+});
+
 app.use(session({
     secret: process.env.SESSION_SECRET, // Secret key for signing the session ID cookie
+    store: sessionStore, // Use Sequelize store for session management
     resave: false, // Forces session to be saved back to the session store
     saveUninitialized: false, // Don't create a session until something is stored
     cookie: {
@@ -32,6 +43,10 @@ app.use(session({
         secure: process.env.NODE_ENV === 'production' // Use secure cookies in production
     }
 }))
+
+// Sync session store
+sessionStore.sync();
+
 app.use(flash()) // Middleware for flash messages
 
 app.use(async (req, res, next)=>{

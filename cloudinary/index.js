@@ -9,16 +9,16 @@ cloudinary.config({
       api_secret: process.env.CLOUDINARY_API_SECRET
 })
 
-const storage = new CloudinaryStorage({
-      cloudinary: cloudinary,
-      params: {
-            folder: 'fms', // Folder in Cloudinary where images will be stored
-            allowed_formats: ['jpg', 'png', 'jpeg'], // Allowed file formats
-            transformation: [{ width: 500, height: 500, crop: 'limit' }] // Optional transformations
-      }
-})
-console.log(storage)
+// const storage = new CloudinaryStorage({
+//       cloudinary: cloudinary,
+//       params: {
+//             folder: 'fms', // Folder in Cloudinary where images will be stored
+//             allowed_formats: ['jpg', 'png', 'jpeg'], // Allowed file formats
+//             transformation: [{ width: 500, height: 500, crop: 'limit' }] // Optional transformations
+//       }
+// })
+// console.log(storage)
 
-module.exports = {cloudinary, storage}
+module.exports = {cloudinary}
 
 

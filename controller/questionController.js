@@ -1,6 +1,7 @@
 require('dotenv').config() // Load environment variables from a .env file into process.env
 const { QueryTypes } = require('sequelize')
 const { questions, users, answers, sequelize } = require("../model")
+const {cloudinary} = require('../cloudinary/index') // Import Cloudinary configuration
 
 exports.renderAskQuestionPage = (req, res) => {
       res.render('questions/askQuestion')
@@ -8,15 +9,27 @@ exports.renderAskQuestionPage = (req, res) => {
 
 exports.handleAskQuestion = async (req, res) => {
       const {title,description} = req.body
+
       const userId = req.userId
       const fileName = req.file.filename
+
+      // **For cloudinary Storage
+      const result = await cloudinary.v2.uploader.upload(req.file.path)
+
       if(!title || !description){
             return res.send("Please provide title and description")
       }
       await questions.create({
             title: title,
             description: description,
-            image: `${process.env.PROJECT_URL}${fileName}`, // Assuming you have a file upload middleware that saves the file and provides the filename 
+            // **For Multer Storage
+            // image: `${process.env.PROJECT_URL}${fileName}`, 
+            // **Or
+            // image: fileName, // Use the filename from multer storage
+
+            // **For cloudinary
+            image: result.url, // Use the secure URL from Cloudinary
+
             userId: userId
       })
       res.redirect('/')

@@ -1,6 +1,6 @@
 require('dotenv').config()
 const cloudinary = require('cloudinary')
-const {CloudinaryStorage} = require('multer-storage-cloudinary')
+// const {CloudinaryStorage} = require('multer-storage-cloudinary')
 
 // configuration
 cloudinary.config({

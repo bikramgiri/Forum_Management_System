@@ -26,9 +26,11 @@ app.use(session({
     secret: process.env.SESSION_SECRET, // Secret key for signing the session ID cookie
     resave: false, // Forces session to be saved back to the session store
     saveUninitialized: false, // Don't create a session until something is stored
-    // cookie: {
-    //     maxAge: 1000 * 60 * 60 * 24 * 2 // Cookie expiration time (2 days)
-    // }
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 2, // Cookie expiration time (2 days)
+        httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
+        secure: process.env.NODE_ENV === 'production' // Use secure cookies in production
+    }
 }))
 app.use(flash()) // Middleware for flash messages
 

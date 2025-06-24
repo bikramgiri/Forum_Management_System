@@ -5,6 +5,11 @@ const app = express()
 const { renderHomePage } = require('./controller/authController')
 const cookieParser = require('cookie-parser')
 
+// **Websecurity
+const sanitizeHtml = require('sanitize-html') // For sanitizing HTML input
+const rateLimit = require('express-rate-limit') // For rate limiting
+const helmet = require('helmet') // For setting various HTTP headers for security
+
 require('./model/index') // Import the database connection and models
 
 const authRoute = require('./routes/authRoute')
@@ -18,6 +23,26 @@ const flash = require('connect-flash')
 const socketio = require('socket.io')
 const { answers, sequelize } = require('./model/index')
 const { QueryTypes } = require('sequelize')
+
+// **Websecurity
+const result = sanitizeHtml("<strong>hello</strong>")
+// console.log(result) 
+
+const rateLimiter = rateLimit({
+    windowMs: 2 * 60 * 1000, // 15 minutes
+    limit: 3, // Limit each IP to 100 requests per windowMs
+    message: "Too many requests, please try again after 2 minutes.",
+    // standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    // legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    skip: (req, res) => {
+        // Skip rate limiting for specific routes or conditions
+        return req.path === '/login' || req.path === '/register';
+    }
+})
+
+app.use("/forgotPassword", rateLimiter) // Apply rate limiting middleware
+
+app.use(helmet()) // Use Helmet to set security-related HTTP headers
 
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({ extended: true })) // server side form data ko lagi

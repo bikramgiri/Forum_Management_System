@@ -13,11 +13,12 @@ const catchError = require("../utils/catchError")
 //// const multer = require('multer') 
 ////const { storage } = require('../cloudinary/index') // Import Cloudinary configuration
 const {multer,storage} = require('../Middleware/multerConfig') 
+const sanitizer = require("../utils/sanitizer")
 const upload = multer({ storage: storage }) // Create a multer instance with the Cloudinary storage configuration
 
 
 
-router.route("/askquestion").post(isAuthenticated, upload.single('image'), catchError(handleAskQuestion)).get(isAuthenticated, catchError(renderAskQuestionPage))
+router.route("/askquestion").post(isAuthenticated, upload.single('image'), sanitizer, catchError(handleAskQuestion)).get(isAuthenticated, catchError(renderAskQuestionPage))
 router.route("/question/:id").get(catchError(renderSingleQuestionPage))
 
 module.exports = router

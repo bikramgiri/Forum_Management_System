@@ -1,3 +1,13 @@
 node_modules
 .env
 note.txt
+
+storage/* // Ignore all files in the storage directory
+# !storage/.gitkeep // But keep the .gitkeep file
+# !storage/.png // Keep all .png files in the storage directory
+!storage/*.jpg // Keep all .jpg files in the storage directory
+!storage/*.jpeg // Keep all .jpeg files in the storage directory
+
+
+
+

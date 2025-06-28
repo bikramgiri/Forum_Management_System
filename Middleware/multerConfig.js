@@ -19,7 +19,7 @@ const multer = require('multer')
 
 
 // **For Cloudinary Storage
-// const cloudinary = require('cloudinary')
+//// const cloudinary = require('cloudinary')
 
 const storage = multer.diskStorage({
       filename: function(req, file, cb) {

@@ -12,34 +12,53 @@
   <main class="content-wrapper">
     <section class="container question-section">
       <h2 class="section-title">Question</h2>
-      <div class="card question-card">
-        <h3 class="question"><%- data[0].title %></h3>
-        <img src="<%- data[0].image %>" alt="Question Image" class="question-image" />
-        <p class="description"><strong>Description:</strong> <span><%- data[0].description %></span></p>
-        <p class="date"><strong>Date:</strong> <span><%= new Date(data[0].updatedAt).toDateString() %></span></p>
-        <p class="author"><strong>Asked by:</strong> <span><%- data[0].user.username %></span></p>
-      </div>
+      <% if (data && data[0]) { %>
+        <div class="card question-card">
+          <h3 class="question"><%- data[0].title %></h3>
+          <img src="<%- data[0].image %>" alt="Question Image" class="question-image" />
+          <p class="description"><strong>Description:</strong> <span><%- data[0].description %></span></p>
+          <p class="date"><strong>Date:</strong> <span><%= new Date(data[0].updatedAt).toDateString() %></span></p>
+          <p class="author"><strong>Asked by:</strong> <span><%- data[0].user.username %></span></p>
+
+          <% if (isAuthenticated && userId && data[0].userId && String(userId) === String(data[0].userId)) { %>
+            <div class="question-actions">
+              <a href="/question/edit/<%- data[0].id %>" class="edit-btn">Edit</a>
+              <button class="delete-btn" data-question-id="<%- data[0].id %>">Delete</button>
+            </div>
+          <% } %>
+        </div>
+      <% } else { %>
+        <p>Question not found.</p>
+      <% } %>
     </section>
 
     <section class="container answer-section">
       <h2 class="section-title">Answers</h2>
-      <% answers.forEach((answer) => { %>
-        <div class="card answer-card">
-          <p class="answer-text"><%- answer.answerText %></p>
-          <p class="date"><strong>Date:</strong> <%= new Date(answer.updatedAt).toDateString() %></p>
-          <p class="author"><strong>Answered by:</strong> <%- answer.user.username %></p>
-          <button class="like-btn" onclick="likePost(<%= answer.id %>)">Like</button>
-          <span id="likes-<%= answer.id %>"><%= answer.likes || 0 %></span>
-        </div>
-      <% }) %>
+      <% if (answers && answers.length > 0) { %>
+        <% answers.forEach((answer) => { %>
+          <div class="card answer-card">
+            <p class="answer-text"><%- answer.answerText %></p>
+            <p class="date"><strong>Date:</strong> <%= new Date(answer.updatedAt).toDateString() %></p>
+            <p class="author"><strong>Answered by:</strong> <%- answer.user.username %></p>
+            <button class="like-btn" data-answer-id="<%= answer.id %>">Like</button>
+            <span id="likes-<%= answer.id %>"><%= answer.likes || 0 %></span>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <p>No answers yet.</p>
+      <% } %>
     </section>
 
     <section class="container form-section">
       <h2 class="section-title">Submit Your Answer</h2>
-      <form action="/answer/<%- data[0].id %>" method="POST">
-        <textarea name="answer" placeholder="Write your answer here..." required></textarea>
-        <button type="submit" class="submit-btn">Submit Answer</button>
-      </form>
+      <% if (data && data[0]) { %>
+        <form action="/answer/<%- data[0].id %>" method="POST">
+          <textarea name="answer" placeholder="Write your answer here..." required></textarea>
+          <button type="submit" class="submit-btn">Submit Answer</button>
+        </form>
+      <% } else { %>
+        <p>Cannot submit an answer because the question was not found.</p>
+      <% } %>
     </section>
   </main>
 
@@ -54,13 +73,46 @@
     const socket = io();
     const jwtToken = getCookie('jwtToken');
 
-    function likePost(answerId) {
-      if (!jwtToken) {
-        alert("You must be logged in to like an answer.");
-        return;
-      }
-      socket.emit("like", { answerId, token: jwtToken });
-    }
+    document.querySelectorAll('.like-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const answerId = button.getAttribute('data-answer-id');
+        if (!jwtToken) {
+          alert("You must be logged in to like an answer.");
+          return;
+        }
+        socket.emit("like", { answerId, token: jwtToken });
+      });
+    });
+
+    document.querySelectorAll('.delete-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const questionId = button.getAttribute('data-question-id');
+        if (!jwtToken) {
+          alert("You must be logged in to delete a question.");
+          return;
+        }
+        if (confirm("Are you sure you want to delete this question?")) {
+          fetch(`/question/delete/${questionId}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${jwtToken}`
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              window.location.href = '/';
+            } else {
+              alert(data.message || "Failed to delete question.");
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert("An error occurred while deleting the question.");
+          });
+        }
+      });
+    });
 
     socket.on("likeUpdate", ({ likesCount, answerId }) => {
       const likesEl = document.getElementById(`likes-${answerId}`);

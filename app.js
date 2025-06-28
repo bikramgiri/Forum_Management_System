@@ -42,7 +42,19 @@ const rateLimiter = rateLimit({
 
 app.use("/forgotPassword", rateLimiter) // Apply rate limiting middleware
 
-app.use(helmet()) // Use Helmet to set security-related HTTP headers
+// app.use(helmet()) // Use Helmet to set security-related HTTP headers
+// For cloudinary image handeling
+// app.use(
+//   helmet.contentSecurityPolicy({
+//     directives: {
+//       defaultSrc: ["'self'"],
+//       imgSrc: ["'self'", "data:", "https://res.cloudinary.com"],
+//       styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles if needed for your CSS
+//       scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts if needed for your EJS
+//       // Add other directives as needed
+//     },
+//   })
+// );
 
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({ extended: true })) // server side form data ko lagi
@@ -78,6 +90,7 @@ app.use(async (req, res, next)=>{
     const token = req.cookies.jwtToken // Get the token from cookies
     try {
         const decrytedResult = await promisify(jwt.verify)(token, process.env.JWT_SECRETKEY)
+        req.userId = decrytedResult.id; // Set req.userId
     if(decrytedResult) {
         res.locals.isAuthenticated = true
     }else{

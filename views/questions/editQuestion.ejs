@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Question</title>
+  <link rel="stylesheet" href="/editQuestion.css" />
+</head>
+<body>
+  <%- include("../components/navbar.ejs") %>
+
+  <main class="container">
+    <h1 class="page-title">Edit Question</h1>
+    <form action="/question/edit/<%= question.id %>" method="POST" enctype="multipart/form-data" class="edit-form">
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" value="<%- question.title %>" required aria-required="true" />
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" required aria-required="true"><%- question.description %></textarea>
+      </div>
+      <div class="form-group">
+        <label for="image">Update Image (optional)</label>
+        <input type="file" id="image" name="image" accept="image/*" aria-describedby="image-help" />
+        <small id="image-help" class="form-help">Upload a new image to replace the current one.</small>
+        <img src="<%- question.image %>" alt="Current question image" class="question-image" />
+      </div>
+      <button type="submit" class="submit-btn" aria-label="Update question">Update Question</button>
+    </form>
+  </main>
+
+  <%- include("../components/footer.ejs") %>
+</body>
+</html>
